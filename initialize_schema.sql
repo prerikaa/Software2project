@@ -1,3 +1,10 @@
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS action_log;
+DROP TABLE IF EXISTS contract;
+DROP TABLE IF EXISTS player;
+DROP TABLE IF EXISTS fuel_price;
+DROP TABLE IF EXISTS game;
+
 CREATE TABLE IF NOT EXISTS game (
     id INT AUTO_INCREMENT PRIMARY KEY,
     difficulty VARCHAR(255),
@@ -15,6 +22,7 @@ CREATE TABLE IF NOT EXISTS player (
     fuel INT,
     home_airport_ident VARCHAR(40) COLLATE latin1_swedish_ci,
     current_airport_ident VARCHAR(40) COLLATE latin1_swedish_ci,
+    city_name VARCHAR(255),
     FOREIGN KEY(game_id) REFERENCES game(id),
     FOREIGN KEY(home_airport_ident) REFERENCES airport(ident),
     FOREIGN KEY(current_airport_ident) REFERENCES airport(ident)
