@@ -96,8 +96,6 @@ def fly():
         return jsonify({"success": False, "message": "Flight system failure."}), 500
 
 
-
-
 @app.route('/refuel', methods=['POST'])
 def refuel():
 
@@ -122,6 +120,29 @@ def refuel():
     except Exception as e:
         print(f"Error in /refuel: {e}")
         return jsonify({"success": False, "message": "Refueling system offline."}), 500
+
+@app.route('/refresh', methods=['POST'])
+def refresh_contracts():
+
+    global refresh_counter
+    if not current_game_id:
+        return jsonify({"error": "No active game"}), 400
+
+    refresh_counter += 1
+    penalty = False
+
+    if refresh_counter >= 3:
+        game_service.reduce_turn(current_game_id)
+        refresh_counter = 0
+        penalty = True
+
+    msg = "Contracts updated!" if not penalty else "Refreshed too many times! Turn deducted."
+    return jsonify({
+        "success": True,
+        "message": msg,
+        "refresh_count": refresh_counter,
+        "penalty_applied": penalty
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
