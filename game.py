@@ -37,5 +37,45 @@ def start_game():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-if __name__ == '_main_':
+@app.route('/status', methods=['GET'])
+def get_status():
+
+    if not current_game_id or not current_player_id:
+        return jsonify({"error": "No active game session found. Please start a new game."}), 400
+
+    try:
+        turns_left = game_service.get_turns_left(current_game_id)
+
+        player = game_service.show_player(current_player_id, turns_left) # player structure: [name, money, fuel, current_airport_ident, city_name]. can be found in show_player function.
+
+        ident = player[3]   # Extract location details ident = 4th column's value in the show_player data.
+        city_name = player[4] # city_name is the fifth column's value.
+
+        coords = game_service.get_airport_coordinates(ident)
+        fuel_price = game_service.get_fuel_price(ident)
+
+        contracts = game_service.get_contracts(current_player_id)
+
+        return jsonify({
+            "pilot": player[0],
+            "money": player[1],
+            "fuel": player[2],
+            "turns": turns_left,
+            "location": ident,
+            "city": city_name,
+            "fuel_price": fuel_price,
+            "coords": {"lat": coords[0], "lng": coords[1]},
+            "contracts": contracts,
+            "max_fuel": game_service.MAX_FUEL,
+            "goal_money": game_service.TARGET_MONEY
+        })
+    except Exception as e:
+        print(f"Error in /status: {e}")
+        return jsonify({"error": "Failed to retrieve game status"}), 500
+
+
+
+
+
+if __name__ == '__main__':
     app.run(debug=True, port=5000)
