@@ -95,6 +95,5 @@ def fly():
         print(f"Error in /fly: {e}")
         return jsonify({"success": False, "message": "Flight system failure."}), 500
 
-
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
