@@ -1,0 +1,122 @@
+body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #000; color: #fff;
+    overflow: hidden;
+}
+
+#map {
+    height: 100vh;
+    width: 100%;
+    z-index: 1;
+}
+
+.hud-layer {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.hud-box {
+    position: absolute;
+    background: rgba(15, 15, 15, 0.9);
+    padding: 15px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    pointer-events: auto;
+    width: 220px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+}
+
+
+.top-left     { top: 20px; left: 20px; }
+.top-right    { top: 20px; right: 20px; }
+.bottom-right { bottom: 20px; right: 20px; }
+
+
+#contract-list {
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.contract-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #2ecc71;
+    text-align: left;
+}
+
+.contract-card strong {
+    color: #2ecc71;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.stat-label { font-size: 0.75rem; font-weight: bold; letter-spacing: 1px; color: #aaa; }
+.stat-text { font-size: 0.85rem; margin-top: 4px; color: #fff; }
+
+.bar-bg { width: 100%; height: 8px; background: #222; border-radius: 4px; margin: 8px 0; }
+.bar-fill { height: 100%; border-radius: 4px; width: 0%; transition: width 0.6s ease; }
+
+.fuel-color  { background: #00ff88; box-shadow: 0 0 8px rgba(0, 255, 136, 0.4); }
+.money-color { background: #ffcc00; box-shadow: 0 0 8px rgba(255, 204, 0, 0.4); }
+.turn-color  { background: #00ccff; box-shadow: 0 0 8px rgba(0, 204, 255, 0.4); }
+
+
+.btn-main, .btn-action {
+    cursor: pointer; border: none; border-radius: 4px;
+    font-weight: bold; transition: 0.2s;
+}
+
+.btn-main { background: #00ccff; color: #000; padding: 12px; width: 100%; }
+.btn-action {
+    background: #333; color: #fff; padding: 8px;
+    font-size: 0.7rem; width: 100%; margin-top: 5px;
+    border: 1px solid #444;
+}
+
+.btn-action:hover { background: #444; }
+
+.leaflet-popup-content-wrapper {
+    background: #fff;
+    color: #333;
+    pointer-events: auto !important;
+}
+
+.leaflet-popup-tip {
+    background: #fff;
+}
+
+.leaflet-popup-content .btn-action {
+    background: #2ecc71 !important;
+    color: #000 !important;
+    border: none;
+    font-weight: bold;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.screen-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); z-index: 100;
+    display: flex; justify-content: center; align-items: center;
+}
+
+.modal {
+    background: #111; padding: 40px; border-radius: 12px;
+    text-align: center; border: 1px solid #333; width: 320px;
+}
+
+.pre-game #map, .pre-game .hud-layer { filter:brightness(10); }
+.hidden { display: none; }
+
+input {
+    width: 90%; padding: 10px; margin: 20px 0; background: #222;
+    border: 1px solid #444; color: #fff; border-radius: 4px;
+}

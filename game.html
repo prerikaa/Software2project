@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cargo Airline Gamer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="pre-game">
+
+    <div id="map"></div>
+
+    <div class="hud-layer">
+
+        <div class="hud-box top-left">
+            <div class="stat-label">MONEY</div>
+            <div class="bar-bg"><div id="money-bar" class="bar-fill money-color"></div></div>
+            <div class="stat-text"><span id="money-val">1000</span>/3000 Euros(€)</div>
+        </div>
+
+        <div class="hud-box top-right">
+            <div class="stat-label">FUEL</div>
+            <div class="bar-bg"><div id="fuel-bar" class="bar-fill fuel-color"></div></div>
+            <div class="stat-text"><span id="fuel-val">500</span>/1000 Units</div>
+            <button class="btn-action" onclick="uiRefuel()">Refuel Aircraft</button>
+        </div>
+
+
+        <div id="contract-list"></div>
+
+
+        <div class="hud-box bottom-right">
+            <div class="stat-label">TURNS LEFT: <span id="turn-val">15</span></div>
+            <div class="bar-bg"><div id="turn-bar" class="bar-fill turn-color"></div></div>
+            <button class="btn-action" onclick="uiRefreshContracts()">Refresh Contracts</button>
+        </div>
+    </div>
+
+    <div id="setup-overlay" class="screen-overlay">
+        <div id="welcome-screen" class="modal">
+            <h1>Welcome Pilot</h1>
+            <p>You have been given a wonderful opportunity right after getting your pilot's license to prove your metal.</p>
+            <p>Make decisions, Achieve target, Secure your future.</p>
+            <p>A successful career awaits.</p>
+            <button class="btn-main" onclick="nextStep()">Next</button>
+        </div>
+
+        <div id="name-screen" class="modal hidden">
+            <h1>Register</h1>
+            <p>Welcome Aboard, Captain!<br>Enter Your Name :</p>
+            <input type="text" id="player-name-input" placeholder="Name...">
+            <button class="btn-main" onclick="finishSetup()">Start the Challenge</button>
+        </div>
+
+        <div id="briefing-screen" class="modal hidden">
+            <h1></h1>
+            <p class="goal-text"></p>
+            <button class="btn-main" onclick="enterGame()">Start the Engines</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
