@@ -75,7 +75,6 @@ def get_status():
 
 @app.route('/fly', methods=['POST'])
 def fly():
-
     try:
         data = request.json
         contract = data.get('contract')
@@ -87,7 +86,6 @@ def fly():
         player = game_service.show_player(current_player_id, 0)
         if player[2] < contract['fuel_needed']:  # player[2] is the fuel level. check if the current fuel level is less than the fuel req.
             return jsonify({"success": False, "message": "Not enough fuel for this flight!"})
-
         msg = game_service.update_player_after_contract(current_game_id, current_player_id, contract)
 
         game_service.reduce_turn(current_game_id) #deduct a turn
@@ -97,6 +95,21 @@ def fly():
         print(f"Error in /fly: {e}")
         return jsonify({"success": False, "message": "Flight system failure."}), 500
 
+@app.route('/refuel', methods=['POST'])
+def refuel():
+
+    try:
+        data = request.json
+        try:
+            amount = int(data.get('amount'))
+        except (TypeError, ValueError):
+            amount = 0
+
+        if amount <= 0:
+            return jsonify({"success": False, "message": "Please enter a positive fuel amount."})
+
+        msg = game_service.refuel_player(current_game_id, current_player_id, amount)
+
         success = msg.startswith("Refueled")  # if the return message after refuel_player function starts with Refueled.
         return jsonify({"success": success, "message": msg})
 
@@ -105,6 +118,7 @@ def fly():
     except Exception as e:
         print(f"Error in /refuel: {e}")
         return jsonify({"success": False, "message": "Refueling system offline."}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
