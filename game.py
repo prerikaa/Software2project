@@ -75,7 +75,6 @@ def get_status():
 
 @app.route('/fly', methods=['POST'])
 def fly():
-
     try:
         data = request.json
         contract = data.get('contract')
@@ -87,7 +86,6 @@ def fly():
         player = game_service.show_player(current_player_id, 0)
         if player[2] < contract['fuel_needed']:  # player[2] is the fuel level. check if the current fuel level is less than the fuel req.
             return jsonify({"success": False, "message": "Not enough fuel for this flight!"})
-
         msg = game_service.update_player_after_contract(current_game_id, current_player_id, contract)
 
         game_service.reduce_turn(current_game_id) #deduct a turn
