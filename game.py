@@ -97,14 +97,7 @@ def fly():
         print(f"Error in /fly: {e}")
         return jsonify({"success": False, "message": "Flight system failure."}), 500
 
-        success = msg.startswith("Refueled")  # if the return message after refuel_player function starts with Refueled.
-        return jsonify({"success": success, "message": msg})
 
-    except ValueError:
-        return jsonify({"success": False, "message": "Invalid number format for fuel."})
-    except Exception as e:
-        print(f"Error in /refuel: {e}")
-        return jsonify({"success": False, "message": "Refueling system offline."}), 500
 
 
 @app.route('/refuel', methods=['POST'])
