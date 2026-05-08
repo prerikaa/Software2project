@@ -47,12 +47,12 @@ async function updateStatus() {
 
         // 1. Check Win/Loss Conditions
         if (data.money >= data.goal_money) {
-            alert(`VICTORY! You earned ${data.money}€ and won the game!`);
+            alert(`VICTORY! You reached the goal of ${data.money}€ and won the game!`);
             location.reload();
             return;
         }
         if (data.turns <= 0) {
-            alert(`GAME OVER! You ran out of turns. Final Bank: ${data.money}€`);
+            alert(`GAME OVER! You ran out of turns. Final money: ${data.money}€. Try again!!`);
             location.reload();
             return;
         }
@@ -156,7 +156,7 @@ uiRefreshContracts = async () => {
 };
 
 uiRefuel = async () => {
-    const amount = prompt("Liters to buy?");
+    const amount = prompt("How many units of fuel do you want to buy?");
     if (!amount || isNaN(amount)) return alert('invalid input');
     const response = await fetch('http://127.0.0.1:5000/refuel', {
         method: 'POST',

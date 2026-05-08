@@ -2,12 +2,10 @@ from db_initializer import get_connection
 from geopy.distance import geodesic
 import random
 
-MAX_FUEL = 2000
+MAX_FUEL = 1000
 TARGET_MONEY = 3000
 TOTAL_TURNS = 15
 
-
-# --- HELPER FUNCTIONS ---
 
 def get_airport_coordinates(ident):
     connection = get_connection()
@@ -17,19 +15,6 @@ def get_airport_coordinates(ident):
     connection.close()
     return result
 
-
-def get_fuel_price(ident):
-    """New helper to match your game.py needs"""
-    connection = get_connection()
-    cursor = connection.cursor()
-    cursor.execute(f"SELECT price_per_unit FROM fuel_price WHERE airport_ident = '{ident}'")
-    result = cursor.fetchone()
-    connection.close()
-    return result[0] if result else 3.50
-
-
-# --- CORE GAME LOGIC ---
-
 def initialize_fuel_prices():
     connection = get_connection()
     cursor = connection.cursor()
@@ -37,10 +22,18 @@ def initialize_fuel_prices():
     airports = cursor.fetchall()
     cursor.execute("DELETE FROM fuel_price")
     for airport in airports:
-        price = round(random.uniform(1.5, 4.5), 2)
+        price = round(random.uniform(2.0, 3.5), 2)
         cursor.execute(f"INSERT INTO fuel_price (airport_ident, price_per_unit) VALUES ('{airport[0]}', {price})")
     connection.commit()
     connection.close()
+
+def get_fuel_price(ident):
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute(f"SELECT price_per_unit FROM fuel_price WHERE airport_ident = '{ident}'")
+    result = cursor.fetchone()
+    connection.close()
+    return result[0] if result else 3.00
 
 
 def create_game():
@@ -60,7 +53,7 @@ def create_player(game_id, name):
     # Fixed: Added city_name 'Helsinki' to initial creation
     cursor.execute(f"""
         INSERT INTO player (game_id, name, money, fuel, home_airport_ident, current_airport_ident, city_name) 
-        VALUES ({game_id}, '{name}', 1000, 800, 'EFHK', 'EFHK', 'Helsinki')
+        VALUES ({game_id}, '{name}', 1000, 500, 'EFHK', 'EFHK', 'Helsinki')
     """)
     player_id = cursor.lastrowid
     connection.commit()
@@ -69,10 +62,6 @@ def create_player(game_id, name):
 
 
 def show_player(player_id, turns_left=None):
-    """
-    CRITICAL FIX: Added city_name to the SELECT.
-    Now returns (name, money, fuel, ident, city_name)
-    """
     connection = get_connection()
     cursor = connection.cursor()
     cursor.execute(f"SELECT name, money, fuel, current_airport_ident, city_name FROM player WHERE id = {player_id}")
@@ -88,9 +77,8 @@ def get_contracts(player_id):
     current_airport_ident = cursor.fetchone()[0]
     current_coords = get_airport_coordinates(current_airport_ident)
 
-    # Limit search to 40 for speed
     cursor.execute(
-        f"SELECT ident, municipality, latitude_deg, longitude_deg FROM airport WHERE ident != '{current_airport_ident}' AND continent = 'EU' AND type IN ('medium_airport', 'large_airport') LIMIT 200")
+        f"SELECT ident, municipality, latitude_deg, longitude_deg FROM airport WHERE ident != '{current_airport_ident}' AND continent = 'EU' AND type IN ('medium_airport', 'large_airport')")
     airports = cursor.fetchall()
     connection.close()
 
@@ -99,16 +87,15 @@ def get_contracts(player_id):
         dist = geodesic((current_coords[0], current_coords[1]), (airport[2], airport[3])).km
         airport_distances.append({"id": airport[0], "name": airport[1], "dist": int(dist)})
 
-    # Pick 3 varied contracts
     try:
         choices = [
             random.choice([a for a in airport_distances if a["dist"] < 1000]),
             random.choice([a for a in airport_distances if 1000 <= a["dist"] < 2500]),
             random.choice([a for a in airport_distances if a["dist"] >= 2500])
+            #get 3 contracts based on the distances. 1 short, 1 medium range and 1 far airport
         ]
     except IndexError:
-        # Fallback if distances aren't perfectly distributed
-        choices = random.sample(airport_distances, 3)
+        choices = random.sample(airport_distances, 3) #probably don't need it. just in case.
 
     contracts = []
     for c in choices:
@@ -130,14 +117,9 @@ def get_contracts(player_id):
 
 
 def refuel_player(game_id, player_id, amount):
-    """
-    FIXED: Signature updated to match game.py call.
-    Automatically fetches price from DB.
-    """
     connection = get_connection()
     cursor = connection.cursor()
 
-    # Get current price and current money
     cursor.execute(f"SELECT current_airport_ident, money, fuel FROM player WHERE id = {player_id}")
     player_data = cursor.fetchone()
     current_airport = player_data[0]
@@ -145,7 +127,7 @@ def refuel_player(game_id, player_id, amount):
     current_fuel = player_data[2]
 
     price = get_fuel_price(current_airport)
-    total_cost = amount * price
+    total_cost = (amount * price)
 
     if total_cost > current_money:
         connection.close()
@@ -158,18 +140,13 @@ def refuel_player(game_id, player_id, amount):
     cursor.execute(f"UPDATE player SET money = money - {total_cost}, fuel = fuel + {amount} WHERE id = {player_id}")
     connection.commit()
     connection.close()
-    return f"Refueled! Cost: {total_cost}€"
+    return f"Refueled! Cost : {total_cost}€"
 
 
 def update_player_after_contract(game_id, player_id, contract):
-    """
-    FIXED: Signature updated to match game.py call.
-    Also updates the city_name column so the HUD stays correct!
-    """
     connection = get_connection()
     cursor = connection.cursor()
 
-    # We update current_airport AND city_name
     cursor.execute(f"""
         UPDATE player 
         SET money = money + {contract['reward']}, 
