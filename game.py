@@ -95,30 +95,6 @@ def fly():
         print(f"Error in /fly: {e}")
         return jsonify({"success": False, "message": "Flight system failure."}), 500
 
-@app.route('/refuel', methods=['POST'])
-def refuel():
-
-    try:
-        data = request.json
-        try:
-            amount = int(data.get('amount'))
-        except (TypeError, ValueError):
-            amount = 0
-
-        if amount <= 0:
-            return jsonify({"success": False, "message": "Please enter a positive fuel amount."})
-
-        msg = game_service.refuel_player(current_game_id, current_player_id, amount)
-
-        success = msg.startswith("Refueled")  # if the return message after refuel_player function starts with Refueled.
-        return jsonify({"success": success, "message": msg})
-
-    except ValueError:
-        return jsonify({"success": False, "message": "Invalid number format for fuel."})
-    except Exception as e:
-        print(f"Error in /refuel: {e}")
-        return jsonify({"success": False, "message": "Refueling system offline."}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
